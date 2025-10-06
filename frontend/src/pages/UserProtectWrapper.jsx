@@ -11,31 +11,27 @@ const UserProtectWrapper = ({
     const { user, setUser } = useContext(UserDataContext)
     const [ isLoading, setIsLoading ] = useState(true)
 
-   useEffect(() => {
-    if (!token) {
-        navigate('/login');
-        return; 
-    }
-    const fetchUser = async () => {
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/profile`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.status === 200) {
-                setUser(response.data);
-                setIsLoading(false);
-            }
-        } catch (err) {
-            console.error('Error fetching profile:', err);
-            localStorage.removeItem('token');
-            navigate('/login');
+    useEffect(() => {
+        if (!token) {
+            navigate('/login')
         }
-    };
 
-    fetchUser();
-}, [token]);
+        axios.get(`${import.meta.env.VITE_BASE_URL}/users/profile`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }).then(response => {
+            if (response.status === 200) {
+                setUser(response.data)
+                setIsLoading(false)
+            }
+        })
+            .catch(err => {
+                console.log(err)
+                localStorage.removeItem('token')
+                navigate('/login')
+            })
+    }, [ token ])
 
     if (isLoading) {
         return (
